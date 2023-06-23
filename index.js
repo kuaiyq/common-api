@@ -1,14 +1,30 @@
 const express = require("express");
 const usersRouter = require("./routes/users");
-const app = express();
-const port = 3000;
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+const path = require("path");
+const roomRouter = require("./routes/rooms.js");
+const dotenv = require("dotenv");
 
-app.use("/users", usersRouter);
+dotenv.config();
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const PORT = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+console.log(process.env.TIMES);
+
+const app = express()
+  .use(cors())
+  .use(express.json())
+  .use(express.static(path.join(__dirname, "public")))
+  .use(bodyParser.json())
+  .use("/api/rooms", roomRouter)
+
+  .use("/users", usersRouter)
+
+  .set("views", path.join(__dirname, "views"))
+  .set("view engine", "ejs")
+  .get("/", (req, res) => res.render("pages/index"));
+
+// /api/rooms/roomslist
+
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));
